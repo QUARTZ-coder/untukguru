@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>selamat hari guru nasional</title>
+    <style>
+        html,body {
+            height: 100%;
+            margin: 0;
+            background: #0b1220; 
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow: hidden;
+        }
+        canvas#particles {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            position: fixed; 
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        :root {
+            --color-white: #ffffff;
+            --color-bg-dark: #12121c; 
+            --color-neon-cyan: #00ffff;
+            --color-neon-blue: #007bff;
+            --color-shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --color-glow: 0 0 8px var(--color-neon-cyan), 0 0 15px var(--color-neon-blue);
+            --transition-speed: 0.3s;
+            --border-radius-card: 16px;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--color-white);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+            position: relative; 
+            z-index: 1; 
+        }
+        .container {
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            align-items: center;
+            opacity: 0; 
+            transition: opacity 1s ease-in;
+            pointer-events: none; 
+            position: relative;
+            z-index: 5;
+        }
+        .container.loaded {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        h1.main-title { 
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--color-neon-cyan);
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: var(--color-glow);
+        }
+        .card {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px); 
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-card);
+            padding: 25px;
+            box-shadow: var(--color-shadow-soft);
+            transition: all var(--transition-speed);
+            width: 100%;
+        }
+        .card:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+        .photo-gallery {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 20px;
+            flex-direction: row; 
+            align-items: flex-start;
+        }
+        .profile-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .profile-photo {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--color-neon-cyan);
+            box-shadow: var(--color-glow);
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+        .profile-photo:hover {
+            transform: scale(1.08) rotate(2deg);
+            border-color: var(--color-neon-blue);
+            box-shadow: 0 0 12px var(--color-neon-blue), 0 0 20px var(--color-neon-cyan);
+        }
+        .developer-label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--color-neon-cyan);
+            text-shadow: 0 0 5px var(--color-neon-cyan);
+            opacity: 0.7;
+            transition: opacity var(--transition-speed);
+        }
+        .datetime-card {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #date-display {
+            font-size: 1.3em;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+        #time-display {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 3em;
+            font-weight: bold;
+            color: var(--color-neon-cyan);
+            text-shadow: var(--color-glow);
+        }
+        .greeting-button-card {
+            text-align: center;
+            padding: 15px 25px;
+            cursor: pointer;
+            border: 2px solid var(--color-neon-cyan);
+            background-color: rgba(0, 255, 255, 0.05);
+        }
+        .greeting-button-card:hover {
+            border-color: var(--color-neon-blue);
+            background-color: rgba(0, 255, 255, 0.15);
+        }
+        .greeting-button-card h2 {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--color-neon-cyan);
+            text-shadow: var(--color-glow);
+            transition: all var(--transition-speed);
+            margin: 0;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none; 
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0; 
+            transition: opacity var(--transition-speed);
+        }
+        .modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: var(--color-bg-dark);
+            border: 2px solid var(--color-neon-cyan);
+            border-radius: var(--border-radius-card);
+            padding: 30px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: var(--color-glow);
+            transform: scale(0.7);
+            transition: transform var(--transition-speed), opacity var(--transition-speed);
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            max-height: 80vh; 
+            overflow: hidden;
+        }
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+            padding-bottom: 10px;
+            width: 100%;
+            flex-shrink: 0;
+        }
+        .modal-header h3 {
+            color: var(--color-neon-cyan);
+            text-shadow: 0 0 5px var(--color-neon-cyan);
+        }
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--color-neon-cyan);
+            font-size: 2em;
+            cursor: pointer;
+            line-height: 1;
+            transition: all var(--transition-speed);
+        }
+        .close-btn:hover {
+            transform: rotate(90deg);
+            color: var(--color-neon-blue);
+        }
+        .modal-content .profile-modal-photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--color-neon-blue);
+            box-shadow: 0 0 8px var(--color-neon-blue);
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+        .biodata-table { 
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1em;
+        }
+        .biodata-table th, .biodata-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+        }
+        .biodata-table th {
+            color: var(--color-neon-cyan);
+            font-weight: 600;
+            width: 35%;
+        }
+        .biodata-table tr:hover {
+            background-color: rgba(0, 255, 255, 0.1);
+        }
+        .biodata-table a {
+            color: var(--color-neon-cyan);
+            text-decoration: none;
+            transition: color var(--transition-speed), text-shadow var(--transition-speed);
+        }
+        .biodata-table a:hover {
+            color: var(--color-neon-blue);
+            text-decoration: underline;
+            text-shadow: 0 0 5px var(--color-neon-blue);
+        }
+        .greeting-modal-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid var(--color-neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            flex-shrink: 0;
+        }
+        .greeting-text-section {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed rgba(0, 255, 255, 0.3);
+            width: 100%;
+        }
+        .greeting-text-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .greeting-text-section .sender-name {
+            font-weight: bold;
+            color: var(--color-neon-blue);
+            margin-top: 10px;
+            display: block;
+        }
+        .greeting-text-section p {
+            font-size: 1em;
+            line-height: 1.5;
+            text-align: center;
+            opacity: 0.9;
+        }
+        .greeting-scroll-content {
+            width: 100%;
+            overflow-y: auto; 
+            padding-right: 15px; 
+        }
+        .new-gallery-card {
+            display: flex;
+            justify-content: center;
+            gap: 20px; 
+            padding: 25px 50px; 
+        }
+        .new-profile-photo {
+            width: 80px;
+            height: 80px; 
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(0, 255, 255, 0.5); 
+            box-shadow: none; 
+            transition: all var(--transition-speed);
+        }
+        .new-profile-photo:hover {
+            transform: scale(1.1);
+            border-color: var(--color-neon-blue);
+            box-shadow: none;
+        }
+        .image-link {
+            text-decoration: none;
+        }
+        .typing-cursor {
+            display: inline-block;
+            width: 0.1em;
+            height: 1.2em;
+            margin-left: 2px;
+            background-color: var(--color-neon-cyan);
+            vertical-align: middle; 
+            animation: neonBlink 0.7s step-end infinite;
+        }
+        @keyframes neonBlink {
+            from, to { opacity: 1;
+            }
+            50% { opacity: 0;
+            }
+        }
+        #json-card-container {
+            width: 480px; 
+            max-width: 90vw; 
+            margin-top: 20px; 
+        }
+        .json-card-style { 
+            width: 100%;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            padding: 15px; 
+            display: flex;
+            flex-direction: column;
+            gap: 15px; 
+            background: #1a1a1a;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.6);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #fff;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .header-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+        .dots {
+            font-size: 18px;
+            font-weight: bold;
+            color: #7f7f7f;
+            line-height: 10px;
+            cursor: pointer;
+        }
+        .json-content-wrapper {
+            display: flex;
+            gap: 10px;
+            min-height: 308px;
+        }
+        .numbers {
+            width: 35px; 
+            text-align: right;
+            padding-right: 8px;
+            font-size: 14px; 
+            color: #7f7f7f;
+            line-height: 22px; 
+            white-space: pre-line;
+            border-right: 1px solid #3a3a3a;
+        }
+        .json-lines {
+            font-size: 14px; 
+            font-family: "Consolas", monospace;
+            color: #fff;
+            line-height: 22px; 
+            white-space: pre;
+        }
+        .line {
+            position: relative;
+            min-height: 22px; 
+            white-space: pre;
+        }
+        .indent-guide {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            border-left: 1px dashed #595959;
+            opacity: 0.7;
+        }
+        .symbol { color: #3ea6ff; }
+        .string { color: #ffffff; }
+        .quote { color: #ff4700; }
+        .loading-gallery-card {
+            display: flex;
+            justify-content: center;
+            gap: 15px; 
+            padding: 15px 0;
+            width: 100%;
+            max-width: 480px; 
+            margin-top: 15px;
+        }
+        .loading-profile-photo {
+            width: 55px; 
+            height: 55px; 
+            border-radius: 50%; 
+            object-fit: cover;
+            border: 2px solid var(--color-neon-cyan); 
+            box-shadow: 0 0 5px var(--color-neon-cyan);
+            transition: transform 0.3s;
+        }
+        
+        .loading-profile-photo:hover {
+            transform: scale(1.15);
+            border-color: var(--color-neon-blue);
+        }
+        @media (max-width: 600px) {
+            h1.main-title {
+                font-size: 2em;
+            }
+            .greeting-button-card h2 {
+                font-size: 2em;
+            }
+            .photo-gallery {
+                flex-direction: row;
+                flex-wrap: wrap; 
+                gap: 20px;
+                justify-content: center;
+            }
+            .profile-photo {
+                width: 120px;
+                height: 120px;
+            }
+            .new-gallery-card {
+                flex-direction: row;
+                flex-wrap: wrap; 
+                gap: 15px; 
+            }
+            .new-profile-photo {
+                width: 60px;
+                height: 60px; 
+            }
+            #time-display {
+                font-size: 2.2em;
+            }
+            .modal-content {
+                padding: 20px;
+            }
+        }
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center;
+            background: #121212; 
+            z-index: 2000;
+            transition: opacity 0.5s ease-out;
+        }
+        #loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loader-box {
+            text-align: center;
+            width: 360px;
+            background: #1e1e1e; 
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .track {
+            width: 100%;
+            height: 60px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .wheel {
+            position: absolute;
+            top: 50%;
+            left: -80px;
+            width: 45px;
+            height: 45px;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            overflow: hidden;
+            animation: move 5s linear forwards;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+        }
+        .wheel2 { animation-delay: .4s;
+        }
+        .wheel img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            animation: spin 5s linear forwards; 
+        }
+        .wheel2 img { animation-delay: .4s;
+        }
+        @keyframes move {
+            0% { transform: translate(-100px, -50%);
+            }
+            100% { transform: translate(420px, -50%);
+            }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg);
+            }
+            100% { transform: rotate(1080deg);
+            }
+        }
+        .progress-track {
+            width: 100%;
+            height: 12px;
+            background: #333333; 
+            border-radius: 50px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+        }
+        .progress {
+            width: 0%;
+            height: 100%;
+            background: #00FFFF;
+            border-radius: 50px;
+            animation: load 5s linear forwards; 
+            background-image: linear-gradient(
+                -45deg, 
+                rgba(255, 255, 255, 0) 0%, 
+                rgba(255, 255, 255, 0.4) 50%, 
+                rgba(255, 255, 255, 0) 100%
+            );
+            background-size: 50px 100%;
+            animation: load 5s linear forwards, shine 2s infinite linear; 
+        }
+        @keyframes shine {
+            0% { background-position: -50px 0;
+            }
+            100% { background-position: 100% 0;
+            }
+        }
+        @keyframes load {
+            0% { width: 0%;
+            }
+            100% { width: 100%;
+            }
+        }
+        .loading-text {
+            font-size: 1.2em;
+            color: #00FFFF; 
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles"></canvas>
+    <div id="loading-overlay">
+        <div class="loader-box" id="box">
+            <div class="track">
+                <div class="wheel wheel1">
+                    <img src="AGUS.jpg" alt="Wheel 1">
+                </div>
+                <div class="wheel wheel2">
+                    <img src="FIQRI.jpg" alt="Wheel 2">
+                </div>
+            </div>
+            <div class="progress-track">
+                <div class="progress"></div>
+            </div>
+            <div class="loading-text" id="loadText">Loading</div>
+        </div>
+        
+        <div class="loading-gallery-card">
+            <img src="git.jpg" alt="Gambar 1" class="loading-profile-photo">
+            <img src="html.jpg" alt="Gambar 2" class="loading-profile-photo">
+            <img src="css.jpg" alt="Gambar 3" class="loading-profile-photo">
+            <img src="js.jpg" alt="Gambar 4" class="loading-profile-photo">
+        </div>
+        <div id="json-card-container">
+            <div class="json-card-style">
+                <div class="card-header">
+                    <div class="header-left">
+                        <img src="vis.jpg" alt="Icon" class="header-icon">
+                        <span>Card JSON</span>
+                    </div>
+                    <div class="dots">
+                        &centerdot; &centerdot; &centerdot;
+                    </div>
+                </div>
+                <div class="json-content-wrapper">
+                    <div class="numbers" id="numBox"></div>
+                    <div class="json-lines" id="jsonBox"></div>
+                </div>
+            </div>
+        </div>
+        </div>
+    <div class="container" id="main-content">
+        <h1 class="main-title"><span style="color: var(--color-neon-blue);">Selamat</span> datang</h1>
+        <div class="card photo-gallery">
+            <div class="profile-item">
+                <img src="AGUS.jpg" alt="Foto Profil 1" class="profile-photo" 
+                data-profile="profil1" data-img-src="AGUS.jpg">
+                <span class="developer-label">DEVELOPER</span>
+            </div>
+            <div class="profile-item">
+                <img src="FIQRI.jpg" alt="Foto Profil 2" class="profile-photo" data-profile="profil2" data-img-src="FIQRI.jpg">
+                <span class="developer-label">DEVELOPER</span>
+            </div>
+        </div>
+        <div class="card datetime-card">
+            <div id="date-display"></div>
+            <div id="time-display">00:00:00</div>
+        </div>
+        <div class="card greeting-button-card" id="show-greeting-btn">
+            <h2>CLICK HERE</h2>
+        </div>
+        
+        <div class="card new-gallery-card">
+            <div class="profile-item">
+                <a href="https://www.instagram.com/osis.smpfikri?igsh=YWx4cHlsdTUweGZ6" target="_blank" class="image-link">
+                    <img src="ins.jpeg" alt="Tambahan Foto 1" class="new-profile-photo">
+                </a>
+                <span class="developer-label">@osis smp fikri</span>
+            </div>
+            <div class="profile-item">
+                <a href="https://www.tiktok.com/@osis_smpfikrijkt?_r=1&_t=ZS-91aEcg25IVJ" target="_blank" class="image-link">
+                    <img src="tik.jpeg" alt="Tambahan Foto 2" class="new-profile-photo">
+                </a>
+                <span class="developer-label">@osis_smpfikrijkt</span>
+            </div>
+        </div>
+        <audio id="audio-player" src="him.mp3" preload="metadata" muted></audio>
+    </div>
+    <div class="modal-overlay" id="modal-overlay-biodata">
+        <div class="modal-content" id="biodata-modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Biodata</h3>
+                <button class="close-btn" id="close-modal-biodata-btn" aria-label="Tutup jendela modal">&times;</button>
+            </div>
+            <img id="profile-modal-img" class="profile-modal-photo" src="" alt="Foto Profil">
+
+            <table class="biodata-table">
+                <thead>
+                    <tr>
+                        <th colspan="2" id="table-name-header"></th>
+                    </tr>
+                </thead>
+                <tbody id="biodata-body">
+                </tobody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-overlay" id="modal-overlay-greeting">
+        <div class="modal-content greeting-modal-content">
+            <div class="modal-header">
+                <h3>Selamat Hari Guru!</h3>
+                <button class="close-btn" id="close-modal-greeting-btn" aria-label="Tutup jendela ucapan">&times;</button>
+            </div>
+            <div class="greeting-scroll-content">
+                <img src="gambar.png" alt="Ilustrasi Hari Guru">
+                
+                <div class="greeting-text-section">
+                    <p id="agus-greeting-text"></p>
+                    <span class="sender-name">— 𝙰𝙶𝚞𝚜 𝙼𝙰𝚞𝙻𝙰𝙽𝙰 𝚂𝙰𝙿𝚞𝚃𝚁𝙰</span>
+                </div>
+                <div class="greeting-text-section">
+                    <p id="fikri-greeting-text"></p>
+                    <span class="sender-name">— FIQRI NAUFAL MAHARDIKA</span>
+                </div>
+            </div> 
+        </div>
+    </div>
+    <script>
+        (function () {
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d', { alpha: true });
+            function resize() {
+                const dpr = Math.max(1, window.devicePixelRatio || 1);
+                canvas.width = Math.round(window.innerWidth * dpr);
+                canvas.height = Math.round(window.innerHeight * dpr);
+                canvas.style.width = window.innerWidth + 'px';
+                canvas.style.height = window.innerHeight + 'px';
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                area = window.innerWidth * window.innerHeight;
+                computeParticleCount();
+            }
+            window.addEventListener('resize', resize);
+            let area = window.innerWidth * window.innerHeight;
+            const densityFactor = 9000;
+            const maxParticlesCap = 1200; 
+            let particleCount = 0;
+            function computeParticleCount() {
+                particleCount = Math.min(maxParticlesCap, Math.round(area / densityFactor));
+                if (particleCount < 40) particleCount = 40; 
+                adjustParticleArray();
+            }
+            const particleRadius = 1.6;
+            const speedBase = 0.25;       
+            const linkDistance = 160;     
+            const minLinkDistance = 22;   
+            const maxLineOpacity = 0.28;  
+            const minSeparation = 12;
+            const repulsionStrength = 0.04; 
+            const wander = 0.6;   
+            let particles = [];
+            class Particle {
+                constructor(x, y, vx, vy) {
+                    this.x = x;
+                    this.y = y;
+                    this.vx = vx;
+                    this.vy = vy;
+                    this.r = particleRadius;
+                }
+                update(delta) {
+                    this.vx += (Math.random() - 0.5) * wander * 0.01;
+                    this.vy += (Math.random() - 0.5) * wander * 0.01;
+                    const maxSp = speedBase * 2.5;
+                    const sp = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+                    if (sp > maxSp) {
+                        this.vx = (this.vx / sp) * maxSp;
+                        this.vy = (this.vy / sp) * maxSp;
+                    }
+                    this.x += this.vx * delta;
+                    this.y += this.vy * delta;
+                    if (this.x < -20) this.x = window.innerWidth + 20;
+                    if (this.x > window.innerWidth + 20) this.x = -20;
+                    if (this.y < -20) this.y = window.innerHeight + 20;
+                    if (this.y > window.innerHeight + 20) this.y = -20;
+                }
+                draw(ctx) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            function initParticles() {
+                particles = [];
+                for (let i = 0; i < particleCount; i++) {
+                    const p = randomParticle();
+                    particles.push(p);
+                }
+            }
+            function randomParticle() {
+                let x, y, tries = 0;
+                do {
+                    x = Math.random() * window.innerWidth;
+                    y = Math.random() * window.innerHeight;
+                    tries++;
+                } while (!validSpawn(x,y) && tries < 8);
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * speedBase + 0.05;
+                const vx = Math.cos(angle) * speed;
+                const vy = Math.sin(angle) * speed;
+                return new Particle(x, y, vx, vy);
+            }
+            function validSpawn(x,y) {
+                for (let i = 0; i < particles.length; i++) {
+                    const dx = particles[i].x - x;
+                    const dy = particles[i].y - y;
+                    if (dx*dx + dy*dy < (minSeparation * minSeparation)) return false;
+                }
+                return true;
+            }
+            function adjustParticleArray() {
+                const diff = particleCount - particles.length;
+                if (diff > 0) {
+                    for (let i = 0; i < diff; i++) particles.push(randomParticle());
+                } else if (diff < 0) {
+                    particles.splice(particles.length + diff);
+                }
+            }
+            function applyRepulsion() {
+                const n = particles.length;
+                for (let i = 0; i < n; i++) {
+                    const a = particles[i];
+                    for (let j = i + 1; j < n; j++) {
+                        const b = particles[j];
+                        const dx = b.x - a.x;
+                        const dy = b.y - a.y;
+                        const dist2 = dx*dx + dy*dy;
+                        if (dist2 === 0) continue;
+                        const dist = Math.sqrt(dist2);
+                        if (dist < minSeparation) {
+                            const push = (minSeparation - dist) * repulsionStrength;
+                            const nx = dx / dist;
+                            const ny = dy / dist;
+                            a.vx -= nx * push;
+                            a.vy -= ny * push;
+                            b.vx += nx * push;
+                            b.vy += ny * push;
+                        }
+                    }
+                }
+            }
+            let last = performance.now();
+            function frame(now) {
+                const delta = Math.min(1.8, (now - last) / (1000 / 60));
+                last = now;
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                for (let p of particles) p.update(delta);
+                applyRepulsion();
+                ctx.lineWidth = 1;
+                for (let i = 0; i < particles.length; i++) {
+                    const a = particles[i];
+                    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                    a.draw(ctx);
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const b = particles[j];
+                        const dx = b.x - a.x;
+                        const dy = b.y - a.y;
+                        const dist2 = dx*dx + dy*dy;
+                        if (dist2 > linkDistance * linkDistance) continue;
+                        const dist = Math.sqrt(dist2);
+                        let t = 1 - (dist / linkDistance);
+                        t = Math.max(0, Math.min(1, t));
+                        const alpha = t * maxLineOpacity;
+                        if (alpha > 0.006) {
+                            ctx.beginPath();
+                            ctx.moveTo(a.x, a.y);
+                            ctx.lineTo(b.x, b.y);
+                            ctx.strokeStyle = `rgba(138, 199, 255, ${alpha})`; 
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(frame);
+            }
+            function burst(x, y, amount = 12) {
+                for (let i = 0; i < amount; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * (speedBase * 3) + 0.6;
+                    const vx = Math.cos(angle) * speed;
+                    const vy = Math.sin(angle) * speed;
+                    const p = new Particle(x + (Math.random()-0.5)*10, y + (Math.random()-0.5)*10, vx, vy);
+                    particles.push(p);
+                    if (particles.length > maxParticlesCap) particles.shift();
+                }
+            }
+            function pointerHandler(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                if (clientX !== undefined && clientY !== undefined) {
+                    const x = clientX - rect.left;
+                    const y = clientY - rect.top;
+                    burst(x, y, 10);
+                }
+            }
+            window.addEventListener('click', pointerHandler);
+            window.addEventListener('touchstart', function(e){ pointerHandler(e); }, {passive:true});
+            resize();
+            initParticles();
+            requestAnimationFrame(frame);
+            computeParticleCount();
+        })();
+    </script>
+    <script>
+        let dot = 0;
+        const txt = document.getElementById("loadText");
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const mainContent = document.getElementById('main-content');
+        const loadingAni = setInterval(() => {
+            dot++;
+            if (dot > 3) dot = 1;
+            txt.textContent = "Loading" + ".".repeat(dot);
+        }, 300);
+        setTimeout(() => {
+            clearInterval(loadingAni);
+            loadingOverlay.classList.add('hidden');
+            mainContent.classList.add('loaded');
+            document.body.addEventListener('click', playAudioWithUnmute, { once: true });
+            document.body.addEventListener('touchend', playAudioWithUnmute, { once: true });
+        }, 6000); 
+        let audioPlayed = false;
+        document.addEventListener('DOMContentLoaded', () => {
+            const hariID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+            const bulanID = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const biodata = {
+                profil1: {
+                    nama: "𝙰𝙶𝚄𝚂 𝙼𝙰𝚄𝙻𝙰𝙽𝙰 𝚂𝙰𝙿𝚄𝚃𝚁𝙰",
+                    sosmed: "https://t.me/lanacantik2", 
+                    kelas: "8.4",
+                    sekolah: "SMP FIKRI",
+                    img: "AGUS.jpg"
+                },
+                profil2: {
+                    nama: "FIQRI NAUFAL MAHARDIKA",
+                    sosmed: "https://www.tiktok.com/@nulmtrx",
+                    kelas: "9.3",
+                    sekolah: "SMP FIKRI",
+                    img: "FIQRI.jpg"
+                }
+            };
+            const AGUS_TEXT = "Untuk Guru-guru SMP FIKRI, kalian adalah taman ilmu yang selalu mekar. Dari tangan kalian, harapan tumbuh seperti mentari yang tak pernah absen menyapa pagi. Terima kasih telah menjadi cahaya yang menuntun langkah kami dan angin yang meneguhkan mimpi kami. Selamat Hari Guru!";
+            const FIQRI_TEXT = "Untuk seluruh Guru SMP FIKRI, kalian adalah pelita yang tak pernah padam dalam ruang belajar kami. Setiap nasihatmu adalah embun pagi yang menenangkan, dan setiap ilmu yang kau beri tumbuh menjadi masa depan kami. Terima kasih telah menjadi pahlawan tanpa tanda jasa yang hatinya lebih luas dari langit dan sabarnya lebih kuat dari ombak. Selamat Hari Guru tanpa kalian, langkah kami hanyalah jalan sunyi tanpa arah. Terima kasih, Guru SMP FIKRI!";
+            
+            const agusTextElement = document.getElementById('agus-greeting-text');
+            const fikriTextElement = document.getElementById('fikri-greeting-text');
+            let agusTimeoutState = { id: null };
+            let fikriTimeoutState = { id: null };
+            function typeText(element, text, speed = 20, 
+            timeoutIdHolder) {
+                let index = 0;
+                element.innerHTML = ''; 
+                const cursor = document.createElement('span');
+                cursor.className = 'typing-cursor';
+                element.appendChild(cursor);
+        
+                function typingStep() {
+                    if (index < text.length) {
+                        const textNode = document.createTextNode(text.charAt(index));
+                        element.insertBefore(textNode, cursor); 
+             
+                        index++;
+                        timeoutIdHolder.id = setTimeout(typingStep, speed); 
+                    } else {
+                        cursor.style.animation = 'none';
+                        cursor.style.backgroundColor = 'transparent'; 
+                        timeoutIdHolder.id = null;
+                    }
+                }
+                typingStep();
+            }
+            function stopTyping() {
+                clearTimeout(agusTimeoutState.id);
+                if (agusTextElement) {
+                    const cursor = agusTextElement.querySelector('.typing-cursor');
+                    if (cursor) cursor.remove();
+                    if (agusTextElement.textContent.length < AGUS_TEXT.length) {
+                       agusTextElement.textContent = AGUS_TEXT;
+                    }
+                }
+                clearTimeout(fikriTimeoutState.id);
+                if (fikriTextElement) {
+                    const cursor = fikriTextElement.querySelector('.typing-cursor');
+                    if (cursor) cursor.remove();
+                    if (fikriTextElement.textContent.length < FIQRI_TEXT.length) {
+                       fikriTextElement.textContent = FIQRI_TEXT;
+                    }
+                }
+            }
+            const dateDisplay = document.getElementById('date-display');
+            const timeDisplay = document.getElementById('time-display');
+            const audioPlayer = document.getElementById('audio-player');
+            const modalOverlayBiodata = document.getElementById('modal-overlay-biodata');
+            const closeModalBiodataBtn = document.getElementById('close-modal-biodata-btn');
+            const profilePhotos = document.querySelectorAll('.profile-photo');
+            const profileModalImg = document.getElementById('profile-modal-img');
+            const showGreetingBtn = document.getElementById('show-greeting-btn');
+            const modalOverlayGreeting = document.getElementById('modal-overlay-greeting');
+            const closeModalGreetingBtn = document.getElementById('close-modal-greeting-btn');
+            const biodataModalContent = document.getElementById('biodata-modal-content');
+            const greetingModalContentElement = document.querySelector('#modal-overlay-greeting .modal-content');
+            
+            const preventParticleBurst = (event) => {
+                event.stopPropagation();
+            };
+            if (mainContent) {
+                mainContent.addEventListener('click', preventParticleBurst);
+                mainContent.addEventListener('touchstart', preventParticleBurst, {passive: true});
+            }
+            if (biodataModalContent) {
+                biodataModalContent.addEventListener('click', preventParticleBurst);
+                biodataModalContent.addEventListener('touchstart', preventParticleBurst, {passive: true});
+            }
+            if (greetingModalContentElement) {
+                greetingModalContentElement.addEventListener('click', preventParticleBurst);
+                greetingModalContentElement.addEventListener('touchstart', preventParticleBurst, {passive: true});
+            }
+            function updateDateTime() {
+                const now = new Date();
+                const hari = hariID[now.getDay()];
+                const tanggal = now.getDate();
+                const bulan = bulanID[now.getMonth()];
+                const tahun = now.getFullYear();
+                dateDisplay.textContent = `${hari}, ${tanggal} ${bulan} ${tahun}`;
+                const hh = now.getHours().toString().padStart(2, '0');
+                const mm = now.getMinutes().toString().padStart(2, '0');
+                const ss = now.getSeconds().toString().padStart(2, '0');
+                
+                timeDisplay.textContent = `${hh}:${mm}:${ss}`;
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            function showBiodataModal(profileKey) {
+                const data = biodata[profileKey];
+                let sosmedContent;
+                if (data.sosmed && data.sosmed.trim() !== "") {
+                    sosmedContent = `<a href="${data.sosmed}" target="_blank" rel="noopener noreferrer">Klik di sini</a>`;
+                } else {
+                    sosmedContent = "Tidak Ada";
+                }
+                profileModalImg.src = data.img;
+                profileModalImg.alt = `Foto ${data.nama}`;
+                
+                document.getElementById('modal-title').textContent = `Biodata: ${data.nama}`;
+                document.getElementById('table-name-header').textContent = 'Detail Profil';
+                document.getElementById('biodata-body').innerHTML = `
+                    <tr><th>Nama</th><td>${data.nama}</td></tr>
+                    <tr><th>Media Sosial</th><td>${sosmedContent}</td></tr>
+                    <tr><th>Kelas</th><td>${data.kelas}</td></tr>
+                    <tr><th>Sekolah</th><td>${data.sekolah}</td></tr>
+                `;
+                modalOverlayBiodata.classList.add('open');
+            }
+            function closeBiodataModal() {
+                modalOverlayBiodata.classList.remove('open');
+            }
+            profilePhotos.forEach(photo => {
+                photo.addEventListener('click', (event) => {
+                    const profileKey = event.target.getAttribute('data-profile');
+                    showBiodataModal(profileKey);
+                });
+            });
+            closeModalBiodataBtn.addEventListener('click', closeBiodataModal);
+            function showGreetingModal() {
+                modalOverlayGreeting.classList.add('open');
+                typeText(agusTextElement, AGUS_TEXT, 20, agusTimeoutState); 
+                setTimeout(() => {
+                     typeText(fikriTextElement, FIQRI_TEXT, 40, fikriTimeoutState);
+                }, 1000);
+            }
+            function closeGreetingModal() {
+                modalOverlayGreeting.classList.remove('open');
+                stopTyping();
+            }
+            showGreetingBtn.addEventListener('click', showGreetingModal);
+            closeModalGreetingBtn.addEventListener('click', closeGreetingModal);
+        });
+        function playAudioWithUnmute() {
+            const audioPlayer = document.getElementById('audio-player');
+            if (audioPlayed) return;
+            audioPlayer.play().catch(error => {
+                console.warn("Autoplay muted diblokir atau gagal dimainkan:", error);
+            });
+            audioPlayer.muted = false; 
+            audioPlayer.volume = 1.0; 
+            audioPlayer.loop = true; 
+            audioPlayed = true; 
+            console.log("Audio berhasil di-unmute setelah interaksi.");
+            document.body.removeEventListener('click', playAudioWithUnmute, { once: true });
+            document.body.removeEventListener('touchend', playAudioWithUnmute, { once: true });
+        }
+        (function() {
+            const jsonText = [
+                '{',
+                '  "people": [',
+                '    {',
+                '      "name": "FIQRI",',
+                '      "title": "Web Developer",',
+                '      "school": "SMP FIKRI",',
+                '      "class": ["9.3"]',
+                '    },',
+                '    {',
+                '      "name": "AGUS",',
+                '      "title": "Web Developer",',
+                '      "school": "SMP FIKRI",',
+                '      "class": ["8.4"]',
+                '    }',
+                '  ]',
+                '}'
+            ];
+            let maxLines = 14; 
+            let jsonIndex = 0;
+            let lineNumber = 1;
+            const numBox = document.getElementById("numBox");
+            const jsonBox = document.getElementById("jsonBox");
+            if (!numBox || !jsonBox) return;
+            function highlightSymbol(ch) {
+                if (ch === '"') return `<span class="quote">"</span>`;
+                if (/[{}[\],:]/.test(ch)) return `<span class="symbol">${ch}</span>`;
+                return `<span>${ch}</span>`;
+            }
+            function applySyntax(str) {
+                let s = str
+                    .replace(/"([^"]*)"/g,
+                        '<span class="quote">"</span><span class="string">$1</span><span class="quote">"</span>'
+                    )
+                    .replace(/([{}[\],:])/g, '<span class="symbol">$1</span>');
+                return s;
+            }
+            function typeNextLine() {
+                numBox.innerHTML += lineNumber + "\n";
+                const div = document.createElement("div");
+                div.className = "line";
+                let rowText = jsonText[jsonIndex] || "";
+                let indentLevel = rowText.match(/^(\s+)/);
+                indentLevel = indentLevel ? indentLevel[0].length / 2 : 0;
+                for (let i = 0; i < indentLevel; i++) {
+                    let g = document.createElement("div");
+                    g.className = "indent-guide";
+                    g.style.left = (i * 18) + "px"; 
+                    div.appendChild(g);
+                }
+                jsonBox.appendChild(div);
+        
+                let typed = "";
+                let idx = 0;
+                function typeChar() {
+                    if (idx < rowText.length) {
+                        typed += highlightSymbol(rowText[idx]);
+                        div.innerHTML = typed;
+                        idx++;
+                        setTimeout(typeChar, 9); 
+                    } else {
+                        div.innerHTML = applySyntax(rowText);
+                        jsonIndex++;
+                        lineNumber++;
+                        if (lineNumber <= maxLines) {
+                            setTimeout(typeNextLine, 50);
+                        }
+                    }
+                }
+        
+                typeChar();
+            }
+            document.addEventListener('DOMContentLoaded', typeNextLine);
+        })();
+    </script>
+</body>
+</html>
